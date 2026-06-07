@@ -1,97 +1,100 @@
-import { useState, useEffect } from "react";
-import "prismjs/themes/prism-tomorrow.css";
-import Editor from "react-simple-code-editor";
-import Prism from "prismjs";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import axios from "axios";
+import { useState } from "react";
 import "./App.css";
 
+import useHistory from "./hooks/useHistory";
+import useCodeReview from "./hooks/useCodeReview";
+import useGithub from "./hooks/useGithub";
+
+import EditorPanel from "./components/EditorPanel";
+import OutputPanel from "./components/OutputPanel";
+import HistorySidebar from "./components/HistorySidebar";
+
 function App() {
-  const [code, setCode] = useState(`function sum(){
-  return 1+1
-}`);
+  const [code, setCode] = useState(
+    `function sum(a, b) {\n  return a + b\n}\n\nconsole.log(sum(1, 2))`,
+  );
+  const [language, setLanguage] = useState("javascript");
+  const [showHistory, setShowHistory] = useState(false);
 
-  const [review, setReview] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // all history logic lives in this hook
+  const { history, saveHistory, clearHistory } = useHistory();
 
-  useEffect(() => {
-    Prism.highlightAll();
-  }, []);
+  // all AI review logic lives in this hook
+  const {
+    review,
+    loading,
+    error,
+    activeTab,
+    score,
+    copied,
+    callAI,
+    handleCopy,
+    loadFromHistory
+  } = useCodeReview(code, language, saveHistory);
 
-  async function reviewCode() {
-  try {
-    setLoading(true);
-    setError("");
-    setReview("");
-
-    const response = await axios.post(
-      "http://localhost:3000/ai/get-review",
-      { code }
-    );
-
-    console.log(response.data);
-
-    // Backend returns plain string
-    setReview(response.data);
-
-  } catch (err) {
-    console.error(err);
-    setError("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-}
+  // all github fetch logic lives in this hook
+  const githubProps = useGithub(setCode, setLanguage);
 
   return (
-    <main>
-      <div className="left">
-        <div className="code">
-          <Editor
-            value={code}
-            onValueChange={(code) => setCode(code)}
-            highlight={(code) =>
-              Prism.highlight(code, Prism.languages.javascript, "javascript")
-            }
-            padding={10}
-            style={{
-              fontFamily: '"Fira Code", monospace',
-              fontSize: 16,
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              height: "100%",
-              width: "100%",
-            }}
-          />
+    <div
+      style={{
+        height: "100vh",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* navbar */}
+      <nav className="navbar">
+        <div className="nav-left">
+          <span className="nav-logo">⚡ CodeReview AI</span>
+          <span className="nav-tag">Powered by Llama 3.1</span>
         </div>
-
-        <button
-          onClick={reviewCode}
-          className="review"
-          disabled={loading}
-        >
-          {loading ? "Analyzing..." : "Review"}
+        <button className="history-btn" onClick={() => setShowHistory(true)}>
+          📋 History ({history.length})
         </button>
+      </nav>
+
+      {/* main body — always 50/50 split */}
+      <div className="app-body">
+        <EditorPanel
+          code={code}
+          setCode={setCode}
+          language={language}
+          setLanguage={setLanguage}
+          loading={loading}
+          activeTab={activeTab}
+          onReview={() => callAI("get-review", "review")}
+          onFix={() => callAI("fix-code", "fix")}
+          onScan={() => callAI("scan-security", "security")}
+          githubProps={githubProps}
+        />
+
+        <OutputPanel
+          review={review}
+          loading={loading}
+          error={error}
+          activeTab={activeTab}
+          score={score}
+          copied={copied}
+          onCopy={handleCopy}
+        />
       </div>
 
-      <div className="right">
-        {loading && (
-          <div className="loader-container">
-            <div className="loader"></div>
-            <p>Analyzing your code...</p>
-          </div>
-        )}
-
-        {error && <div className="error">{error}</div>}
-
-        {!loading && review && (
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {review}
-          </ReactMarkdown>
-        )}
-      </div>
-    </main>
+      {/* history sidebar — slides in from right */}
+      {showHistory && (
+        <HistorySidebar
+          history={history}
+          onLoad={(item) => {
+            // clicking a history item loads it back into output
+            loadFromHistory(item)
+            setShowHistory(false);
+          }}
+          onClear={clearHistory}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
+    </div>
   );
 }
 

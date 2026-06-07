@@ -1,238 +1,723 @@
-/* ===============================
-   Global Reset
-================================= */
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 html,
 body,
 #root {
-  height: 100%;
   width: 100%;
-  font-family: "Inter", sans-serif;
-  background-color: #0f0f0f;
-  color: #ffffff;
-}
-
-/* ===============================
-   Layout
-================================= */
-
-main {
   height: 100%;
-  width: 100%;
-  padding: 2rem;
-  display: flex;
-  gap: 1.5rem;
-}
-
-/* ===============================
-   Panels
-================================= */
-
-main .left,
-main .right {
-  height: 100%;
-  flex-basis: 50%;
-  border-radius: 18px;
   overflow: hidden;
-  backdrop-filter: blur(8px);
 }
 
-/* ===============================
-   Left Panel (Editor)
-================================= */
-
-main .left {
-  background: #111;
-  position: relative;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  border: 1px solid #1f1f1f;
+body {
+  font-family: "Fira Code", "Courier New", monospace;
+  background: #0d1117;
+  color: #cdd9e5;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.left .code,
-.code pre,
-.code pre code {
-  height: 100%;
+/* ── NAVBAR ── */
+.navbar {
+  height: 48px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-logo {
+  font-size: 15px;
+  font-weight: 700;
+  color: #7c85ff;
+  letter-spacing: -0.3px;
+}
+
+.nav-tag {
+  font-size: 11px;
+  color: #484f58;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.history-btn {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  background: #21262d;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.history-btn:hover {
+  border-color: #7c85ff;
+  color: #cdd9e5;
+}
+
+/* ── MAIN LAYOUT — always 50/50 ── */
+.app-body {
+  display: flex;
+  height: calc(100vh - 48px);
   width: 100%;
-  margin: 0;
-  border-radius: 18px;
-  background-color: #1e1e1e;
+  overflow: hidden;
 }
 
-/* ===============================
-   Review Button
-================================= */
+/* ── LEFT PANEL ── */
+.left-panel {
+  width: 50%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #30363d;
+}
 
-main .left .review {
-  position: absolute;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  padding: 0.8rem 2.2rem;
+.panel-bar {
+  height: 40px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.panel-label {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #484f58;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.lang-select {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  background: #21262d;
+  color: #cdd9e5;
+  border: 1px solid #30363d;
+  padding: 4px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+.lang-select:focus {
+  border-color: #7c85ff;
+}
+
+/* code editor scrollable area */
+.editor-area {
+  flex: 1;
+  overflow: auto;
+  background: #0d1117;
+}
+
+/* action buttons row */
+.btn-row {
+  height: 52px;
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #161b22;
+  border-top: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.btn {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
-  border-radius: 12px;
-  transition: all 0.25s ease;
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition:
+    opacity 0.15s,
+    filter 0.15s;
 }
 
-main .left .review:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.6);
-}
-
-main .left .review:disabled {
-  opacity: 0.6;
+.btn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-/* ===============================
-   Right Panel (Review Output)
-================================= */
+.btn:not(:disabled):hover {
+  filter: brightness(1.1);
+}
 
-main .right {
-  background: #161616;
-  padding: 2rem;
-  font-size: 1rem;
+.btn-review {
+  background: #7c85ff;
+  color: #fff;
+}
+.btn-fix {
+  background: #2ea043;
+  color: #fff;
+}
+.btn-scan {
+  background: #d29922;
+  color: #0d1117;
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  width: 50%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.output-bar {
+  height: 40px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.output-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-badge {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.tab-badge.review {
+  background: #3730a3;
+  color: #a5b4fc;
+}
+.tab-badge.fix {
+  background: #14532d;
+  color: #86efac;
+}
+.tab-badge.security {
+  background: #78350f;
+  color: #fcd34d;
+}
+
+.copy-btn {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  background: #21262d;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.copy-btn:hover {
+  border-color: #8b949e;
+  color: #cdd9e5;
+}
+.copy-btn.done {
+  border-color: #2ea043;
+  color: #2ea043;
+  background: #14532d22;
+}
+
+/* score row */
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.score-ring {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.score-ring.s-great {
+  color: #2ea043;
+  border-color: #2ea043;
+  background: #14532d18;
+}
+.score-ring.s-good {
+  color: #7c85ff;
+  border-color: #7c85ff;
+  background: #3730a318;
+}
+.score-ring.s-ok {
+  color: #d29922;
+  border-color: #d29922;
+  background: #78350f18;
+}
+.score-ring.s-poor {
+  color: #f85149;
+  border-color: #f85149;
+  background: #7f1d1d18;
+}
+
+.score-text h4 {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cdd9e5;
+}
+
+.score-text p {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #484f58;
+  margin-top: 2px;
+}
+
+/* output scroll area */
+.output-scroll {
+  flex: 1;
   overflow-y: auto;
-  line-height: 1.7;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  border: 1px solid #1f1f1f;
-  animation: fadeIn 0.3s ease-in-out;
+  padding: 18px 20px;
 }
 
-/* ===============================
-   Markdown Styling
-================================= */
-
-.right h1 {
-  font-size: 1.6rem;
-  margin-bottom: 1rem;
-  color: #ffffff;
-}
-
-.right h2 {
-  font-size: 1.3rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.7rem;
-  color: #a78bfa;
-}
-
-.right h3 {
-  margin-top: 1rem;
-  color: #c084fc;
-}
-
-.right p {
-  margin-bottom: 0.8rem;
-  color: #d4d4d4;
-}
-
-.right ul {
-  padding-left: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-.right li {
-  margin-bottom: 0.4rem;
-}
-
-.right code {
-  background: #2a2a2a;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: #a78bfa;
-}
-
-.right pre {
-  background: #1e1e1e;
-  padding: 1rem;
-  border-radius: 12px;
-  overflow-x: auto;
-  margin-bottom: 1rem;
-}
-
-/* ===============================
-   Scrollbar Styling
-================================= */
-
-.right::-webkit-scrollbar {
-  width: 8px;
-}
-
-.right::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 10px;
-}
-
-.right::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* ===============================
-   Loader
-================================= */
-
-.loader-container {
+/* ── EMPTY STATE — same size as output state ── */
+.empty-state {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  gap: 1rem;
-  color: #a78bfa;
-  font-weight: 500;
+  gap: 10px;
+  color: #30363d;
+  user-select: none;
 }
 
-.loader {
-  width: 45px;
-  height: 45px;
-  border: 4px solid #333;
-  border-top: 4px solid #8b5cf6;
+.empty-state .e-icon {
+  font-size: 36px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #484f58;
+}
+
+.empty-state p {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  color: #30363d;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* three action pills shown in empty state */
+.empty-pills {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pill {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.pill-r {
+  color: #7c85ff;
+  border-color: #7c85ff33;
+  background: #7c85ff0a;
+}
+.pill-f {
+  color: #2ea043;
+  border-color: #2ea04333;
+  background: #2ea0430a;
+}
+.pill-s {
+  color: #d29922;
+  border-color: #d2992233;
+  background: #d299220a;
+}
+
+/* ── LOADING ── */
+.loading-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #21262d;
+  border-top-color: #7c85ff;
   border-radius: 50%;
-  animation: spin 0.9s linear infinite;
+  animation: spin 0.75s linear infinite;
 }
 
 @keyframes spin {
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
 
-/* ===============================
-   Error Styling
-================================= */
-
-.error {
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  padding: 1rem;
-  border-radius: 10px;
-  color: #ff6b6b;
-  margin-bottom: 1rem;
+.loading-state p {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: #484f58;
 }
 
-/* ===============================
-   Animations
-================================= */
+/* ── ERROR ── */
+.error-box {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  background: #7f1d1d1a;
+  border: 1px solid #f8514944;
+  color: #f85149;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── MARKDOWN OUTPUT ── */
+.output-scroll h1,
+.output-scroll h2,
+.output-scroll h3 {
+  font-family: "Segoe UI", sans-serif;
+  color: #cdd9e5;
+  margin: 16px 0 8px;
+  font-size: 14px;
+}
+
+.output-scroll p {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: #8b949e;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.output-scroll ul,
+.output-scroll ol {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: #8b949e;
+  padding-left: 18px;
+  margin-bottom: 12px;
+}
+
+.output-scroll li {
+  margin-bottom: 5px;
+  line-height: 1.6;
+}
+
+.output-scroll code {
+  font-family: "Fira Code", monospace;
+  font-size: 12px;
+  background: #161b22;
+  color: #7c85ff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #30363d;
+}
+
+.output-scroll pre {
+  background: #161b22 !important;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 14px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.output-scroll pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #cdd9e5;
+  font-size: 13px;
+}
+
+.output-scroll strong {
+  color: #cdd9e5;
+}
+
+/* ── HISTORY SIDEBAR ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #00000077;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sidebar {
+  width: 340px;
+  height: 100%;
+  background: #161b22;
+  border-left: 1px solid #30363d;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-head {
+  height: 48px;
+  border-bottom: 1px solid #30363d;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-head h3 {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #cdd9e5;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #484f58;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.close-btn:hover {
+  color: #cdd9e5;
+  background: #21262d;
+}
+
+.sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.no-history {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: #484f58;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.h-item {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.h-item:hover {
+  border-color: #7c85ff;
+}
+
+.h-item-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.h-lang {
+  font-size: 10px;
+  font-weight: 700;
+  background: #21262d;
+  color: #7c85ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.h-type {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #484f58;
+  text-transform: capitalize;
+  flex: 1;
+}
+
+.h-time {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 10px;
+  color: #30363d;
+}
+
+.h-preview {
+  font-size: 11px;
+  color: #484f58;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clear-btn {
+  margin: 10px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  background: none;
+  border: 1px solid #f8514933;
+  color: #f85149;
+  padding: 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clear-btn:hover {
+  background: #7f1d1d22;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #21262d;
+  border-radius: 2px;
+}
+
+/* ── GITHUB BAR ── */
+.github-bar {
+  padding: 8px 12px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.github-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.github-icon {
+  color: #8b949e;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.github-input {
+  flex: 1;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #cdd9e5;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+
+.github-input::placeholder {
+  color: #484f58;
+}
+
+.github-input:focus {
+  border-color: #7c85ff;
+}
+
+.github-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.github-fetch-btn {
+  background: #238636;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.github-fetch-btn:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.github-fetch-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.github-success {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #2ea043;
+  margin-top: 5px;
+}
+
+.github-success span {
+  font-weight: 600;
+  color: #86efac;
+}
+
+.github-error {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #f85149;
+  margin-top: 5px;
 }
